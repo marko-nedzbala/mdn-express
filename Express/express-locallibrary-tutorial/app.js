@@ -38,7 +38,6 @@ mongoose.set('strictQuery', false);
 mongoose.set('strictPopulate', false);
 // define the database URL and connect to it
 // local instance
-const mongoDB = 'mongodb+srv://marko:jamesMarson@nodeprojectcourse.50zdp07.mongodb.net/local_library?retryWrites=true&w=majority&appName=NodeProjectCourse';
 
 // const mongoDB = process.env.MONGODB_URI || dev_db_url;
 
