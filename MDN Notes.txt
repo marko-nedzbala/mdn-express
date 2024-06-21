@@ -1,0 +1,730 @@
+
+
+Guides
+    -> Server-side website programming
+        -> First Steps
+
+This article will give a good description of FTP managers, even though they are now becoming outdated
+https://developer.mozilla.org/en-US/docs/Learn/Common_questions/Tools_and_setup/What_software_do_I_need
+
+https://apps.kde.org/konqueror/
+
+Open world Devices for testing
+https://www.smashingmagazine.com/2016/11/worlds-best-open-device-labs/#odls-have-opened-doors-for-idls
+
+
+Guides
+    -> Server-side website programming
+        -> Express web framework (Node.js/JavaScript)
+
+https://github.com/mdn/express-locallibrary-tutorial/tree/main
+
+Express provides methods framework
+    particular HTTP verb: GET, POST, PUT
+    URL pattern: Route
+    methods to specify what template, "view" engine is used
+
+//this is required or the sever will never listen
+app.listen(3000);
+
+importing and exporting
+//exporting
+exports.func01 = function () { ... }
+
+//export an entire module
+module.exports = {
+    func01() { ... },
+    func02() { ... },
+};
+
+//importing
+const mine = require('./myFile');
+mine.func01();
+
+Route handlers
+app.get('/', function(req, res) {
+    res.send('Hello world');
+});
+
+res.send();
+res.json();
+res.sendFile();
+
+group handlers together using express.Router
+
+// wiki.js
+const express = require('express');
+const router = express.Router();
+router.get('/', ourFunction);
+router.get('/about', ourFunction);
+module.exports = router;
+
+//app.js, all pages are based on wiki
+const wiki = require('./wiki.js');
+app.use('/wiki', wiki);
+
+Middleware
+route functions end the HTTP request-response cycle by returning some response to the HTTP client
+
+middleware functions typically perform some operation on the request/response aand then call the next function in the "stack", either middleware or a route handler
+call next() to continue the request/response cycle
+
+onst myMiddleWate = function(req, res, next) { ... }
+
+2 ways to use Middleware
+app.use(myMiddleWare);
+app.use('/someroute', myMiddleWare);
+
+Serving static files
+the only middleware function part of Express
+use to serve static files:
+    images, CSS, JavaScript
+
+app.use(express.static('pulic'));
+
+files are served by adding their filename to the base URL
+http://localhost:3000/images/dog.jpg
+
+can create a virtual prefix for your static URLs, rather than having the files added to the base URL
+app.use('/media', express.static('public'));
+http://localhost:3000/media/images/dog.jpg
+
+Handling errors
+(err, req, res, next)
+must be called after all other app.use() and routes calls, the last middleware in request handling process
+
+Rendering data (views)
+allow you to specify the structure of an output document in a template, using placholders for data that will be filled in when a page is generated
+
+const path = require('path');
+// set the directory to contain the templates, 'views'
+app.set('views', path.join(__dirname, 'views'));
+
+// set the engine to use the template engine
+app.set('view engine', 'templateEngineName');
+
+example of rendering
+app.get("/", function (req, res) {
+  res.render("index", { title: "About dogs", message: "Dogs rock!" });
+});
+
+
+
+Node/Express a web application creates and runs its own web server
+
+Installing Node.js
+Node Version Manager (nvm) --> LTS of Node.js and then npm
+
+Steps
+$ npm init
+$ npm install express
+
+minimum setup
+const express = require('express');
+const app = express();
+const port = 3000;
+app.get('/', (req, res) => { res.send('Hello world'); });
+app.listen(port, () => { console.log(`Example app listening on port ${port}!`); });
+
+$ node app.js
+
+Development dependencies
+$ npm install esling --save-dev
+
+Running tasks
+https://docs.npmjs.com/cli/v10/commands/npm-run-script
+
+can use npm to execute them
+example
+"scripts": {
+    "lint": "esling src/js"
+}
+
+can run esling either way
+$ npm run-script lint
+$ npm run lint  //using the alias
+
+Express Application Generator
+creates a skeleton Express web app that follows the MVC pattern
+
+$ npm install express-generator -g
+in the folder you want to create the new app
+$ express myAppName
+
+the following commands
+$ cd myAppName
+$ npm install
+$ DEBUG=myAppName:* npm start   //run the app
+
+The rest will be a tutorial and the notes will be from there
+
+the entire developed version is here on GitHub
+https://github.com/mdn/express-locallibrary-tutorial
+
+Express Application Generator
+uses Pug (Jade) by default
+
+Tempating engines
+    EJS
+    Hbs
+    Pug (Jade)
+    Twig
+    Vash
+
+CSS stylesheet engine
+    LESS
+    SASS
+    Compass
+    Stylus
+
+using the Express Application Generator
+$ express appName --view=pug
+
+DEBUG=express-locallibrary-tutorial:* npm start
+
+Nodemon
+$ npm install --save-dev nodemon
+
+add this to your package.json file
+"scripts": {
+    "start": "node ./bin/www",
+    "devstart": "nodemon ./bin/www",
+    "serverstart": "DEBUG=my-app-name:* npm run devstart"
+    // Windows
+    "serverstart": "SET DEBUG=my-app-name:* & npm run devstart"
+  },
+
+// start the server
+$ npm run devstart
+
+$ rs //restart the server
+can no longer call $ npm start because "start" is actually an npm command that is mapped to the named script
+
+Directory structure
+app.js
+/bin
+    www
+package.json
+/node_modules
+/public
+    /images
+    /javascripts
+    /stylesheets
+        style.css
+/routes
+    index.js
+    users.js
+/views
+    error.pug
+    index.pug
+    layout.pug
+
+^1.12.0
+can automatically update to the latest minor.patch with $ npm update --save
+
+/bin/www
+the application entry point, it "requires" the "real" application entry point, app.js
+
+Adding views
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'pug');
+
+Middleware
+app.use(express.json());                                // needed to populate req.body with the form fields
+app.use(express.urlencoded({ extended: false }));       // needed to populate req.body with the form fields
+app.use(cookieParser());                                // cookies
+app.use(express.static(path.join(__dirname, 'public'))); //serve all the static files in /public directory
+
+Routes
+users.js
+const express = require('express');
+const router = express.Router();
+
+/* GET users listing. */
+// this becomes /users/ because /users is already define in app.js
+router.get('/', function(req, res, next) {
+  res.send('respond with a resource');
+});
+
+module.exports = router;
+
+Views (templates)
+render the template along with the values of named variables passed in an object, then send the result as a response
+
+the index.js file
+const express = require('express');
+const router = express.Router();
+
+/* GET home page. */
+router.get('/', function(req, res, next) {
+  res.render('index', { title: 'Express' });
+});
+
+module.exports = router;
+
+
+
+Database (Mongoose)
+using a database
+1.) either native SQL statements
+2.) Object Relational Mapper ("ORM"), in this case native JavaScript objects
+
+can use odm and orm tags to search npm
+
+Popular ORMs
+    Mongoose: MongoDB
+    Waterline: froms Sails web framework, Redis, MySQL, LDAP, MongoDB, Postgres
+    Bookshelf: Postgres, MySQL, SQLite3
+    Object: Postgres, MySQL, SQLite3
+    Sequelize: Postgres, MySQL, SQLite3, MS SQL, MariaDB
+    Node ORM2: Postgres, MySQL, SQLite3
+    GraphQL: restful APIs, GraphQL
+
+$ npm install mongoose
+
+Connect to MongoDB
+
+set this up in app.js
+const mongoose = require('mongoose');
+// remove warnings for Mongoose 7
+mongoose.set('strictQuery', false);
+// define the database URL and connect to it
+// local instance
+const mongoDB = 'mongodb://127.0.0.1/my_database';
+// wait for the database to connect
+main().catch((err) => console.log(err));
+async function main() {
+    await mongoose.connect(mongoDB);
+}
+
+can create additional connections with mongoose.createConnection(), returns a Connection object
+
+Define and create models
+use the Schema interface, allows you to define the fields stored in each document along with their validation requirements and default values
+
+schemas are compiled into models using mongoose.model()
+
+each model maps to a collection of documents in the MongoDB database, the documents will contain the fields/schema types defined in the model Schema
+
+Defining schemas
+/models
+
+basic schema example
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;     // define a schema
+const MyModel = new Schema({
+    a_string: String,
+    a_date: Date,
+});
+
+// compile the model from a schema
+const SomeModel = mongoose.model("SomeModel", MyModel);
+
+Validation
+provides built-in and custom validators
+
+built-in validators include:
+    All SchemaTypes: required
+    Numbers: min and max
+    Strings: enum, match, maxLength and minLength
+
+Virtual properties
+document properties that you can get and set, but not persisted to MongoDB
+getters: useful for formatting or combining fields
+setters: useful for de-composing a single value into multiple values for storage
+
+Using models
+once a schema is created you can use it to create models. The model represents a collection of documents in the database that can be searched, while the model's instances represent individual documents that can be saved and retrieved
+
+// create an instance of a model, SomeModel
+const modelInstance = new SomeModel({ name: "aModel"});
+// save the new model async
+await modelInstance.save();
+
+or create and save it at the same time
+
+await SomeModel.create({ name: "aModel"});
+
+// full example
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;     // define a schema
+const MyModel = new Schema({
+    a_string: String,
+    a_date: Date,
+});
+
+// compile the model from a schema
+const SomeModel = mongoose.model("SomeModel", MyModel);
+
+// can also export the schema
+module.exports = mongoose.model('SomeModel', MyModel);
+
+// create an instance of a model, SomeModel
+const modelInstance = new SomeModel({ name: "aModel"});
+// save the new model async
+await modelInstance.save();
+
+Querying
+use find() to return a variable of type Query and build up a query object before executing it with exec()
+
+Related documents
+references
+ObjectId schema field: 1 document --> 1 document
+array of ObjectIds: 1 document --> many documents
+
+the field stores the id of the related model, but if you need the actual content of the associated document can use populate() in a query to replace the id with the actual data
+
+best illustrated by an example
+
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+
+// multiple documents
+const author = new Schema({
+    name: String,
+    stories: [{ type: Schema.Types.ObjectId, ref: 'Story' }],
+});
+
+// 1 document
+const story = new Schema({
+    author: { type: Schema.Types.ObjectId, ref: 'Author' },
+    title: String,
+});
+
+// now create them
+const Story = mongoose.model('Story', story);
+const Author = mongoose.model('Author', author);
+
+Now to save our references to the related data
+const bob = new Author({ name: 'Bob Smith' });
+await bob.save();
+const story = new Story({
+    title: "A book",
+    author: bob._id,    //assigns the _id from Bob
+});
+await story.save();
+
+finding the ID
+Story.findOne({ title: "A book"}).populate("author").exec();
+
+best to define each model schema in its own module (file), easier to export
+
+module.exports = mongoose.model('SomeModel', MyModel);
+
+// importing
+const SomeModel = require('../models/SomeMode');
+const modelInstance = await SomeMode.find().exec();
+
+Setting up the MongoDB database
+
+const app = express();
+
+/* The database setup */
+const mongoose = require('mongoose');
+// remove warnings for Mongoose 7
+mongoose.set('strictQuery', false);
+// define the database URL and connect to it
+// local instance
+const mongoDB = 'mongodb+srv://marko:jamesMarson@nodeprojectcourse.50zdp07.mongodb.net/local_library?retryWrites=true&w=majority&appName=NodeProjectCourse';
+// wait for the database to connect
+main().catch((err) => console.log(err));
+async function main() {
+    await mongoose.connect(mongoDB);
+}
+
+Defining the schema
+const mongoose = require('mongoose');
+
+const Schema = mongoose.Schema;
+
+const AuthorSchema = new Schema({
+    first_name: { type: String, required: true, maxLength: 100 },
+    family_name: { type: String, required: true, maxLength: 100 },
+    date_of_birth: { type: Date },
+    date_of_death: { type: Date },
+});
+
+module.exports = mongoose.model('Author', AuthorSchema);
+
+
+
+Routes and Controllers
+
+controllers: functions that separate out the code to route requests from the code that actually process requests
+
+Routes: forward the supported requests, and any information encoded in request URLs, to the appropriate controller functions.
+Controller functions: get the requested data from the models, create an HTML page that displays the data and return it to the user in the view in the browser
+Views (templates): used by the controllers to render the data
+
+a route is a section of Express code that associates:
+1.) an HTTP verb, GET, POST, PUT, DELETE
+2.) a URL path/pattern
+3.) a function that is called to handle that pattern
+
+Create a route moudle and use it in Express
+
+router functions are Express Middleware so they must either
+1.) complete (respond to) the request or
+2.) call next()
+
+HTTP verbs
+post(), put(), delete(), options(), trace(), copy(), lock(), mkcol(), move(), purge(), propfind(), proppatch(), unlock(), report(), mkactivity(), checkout(), merge(), m-search(), notify(), subscribe(), unsubscribe(), patch(), search(), and connect()
+
+route paths
+define the endpoints at which requests can be made, for example '/' or '/about'
+
+route parameters
+named URL segments use to capture values at specific positions in the URL
+/:my_Value/
+captured values are stored in req.params object
+req.params.my_value
+
+Handling exceptions in route functions
+the framework is designed to use async functions that take a callback function (error and result argument) is called when the operation completes. We must catch and then forward errors (this should change in Express 5)
+
+try {
+    //code that could error
+} catch (error) {
+    return next(error);
+}
+
+instead will use the express-async-handler module, defines a wrapper function that hides try...catch block
+asyncHandler(async (req, res, next) => { ... });
+
+$ npm install express-async-handler
+
+W3C advice for URLs
+https://www.w3.org/Provider/Style/URI
+
+Controller
+/controllers
+
+you create controller files/modules to handle your information
+
+Example controller
+const Auther = require('../models/author');
+const asyncHandler = require('express-async-handler');
+
+exports.author_list = asyncHandler(async (req, res, next) => {
+    res.send('Author list');
+});
+
+/routes/catalog.js
+const express = require('express');
+const router = express.Router();
+
+const book_controller = require('../controllers/bookController');
+const author_controller = require('../controllers/authorController');
+const genre_controller = require('../controllers/genreController');
+const book_instance_controller = require('../controllers/bookinstanceController');
+
+// there is a method in the book_controller module that is named index
+router.get('/', book_controller.index);
+
+app.js
+const express = require('express');
+const catalogRouter = require('./routes/catalog');
+...
+app.use('/catalog', catalogRouter);
+
+Steps:
+1.) Create the controllers
+2.) Create the routes, import the controllers
+3.) Add routes to middleware chain, add them to app.js
+
+
+
+Displaying data
+
+Template primer
+template: a text file defining the structure or layout of an output file, with placeholders used to represent where data will be inserted when the template is rendered
+
+configure the template
+// View engine setup
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "pug");
+
+Pug
+#{escaped data}
+!{unescaped data}
+
+Extending templates
+
+layout.pug
+html
+    head
+        title= title
+    body
+        block content
+
+index.pug
+extends layout
+
+block content
+    h1= title
+
+rendering
+our controller.js file
+exports.index = asyncHandler(async (req, res, next) => {
+    const [item01, item02] = await Promise.all([
+        Model.countDocuments({}).exec(),
+        Model02.countDocuments({ stauts: 'Available' }).exec()
+    ]);
+// index or the name of our .pug file
+res.render('index', {
+    title: item01,
+    count: itme02
+    });
+});
+
+our pug file
+ul
+    li=title
+    li !{count}
+
+luxon a library for parsing, validating, manipulating, formatting and localising dates
+$ npm install luxon
+
+const { DateTime } = require('luxon');
+
+
+
+Working with forms
+form attributes define the HTTP method used to send the data and the destination of the data on the server (action)
+action: resource/URL where data is to be sent for processing when the form is submitted
+method: the HTTP method used to send the data
+    POST: should be used if the data is going to result in a change to the server's database, more resistant to cross-site           forgery request attacks
+    GET: should only be used for forms that don't change user data, when you bookmark/share the URL
+
+use express-validator module to perform both validation and sanitization of our form data
+$ npm install express-validator
+
+const { body, validationResult } = require("express-validator");
+
+will need to get better at builder forms, but this really is making a lot of sense
+
+
+
+Deploying to production
+Should return to this when ready to deploy your website
+https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/deployment
+
+Infrastructure as a Service (IaaS): hosting company provides the hardware and you install everything
+Platform as a Servuce (PaaS): hosting company provides everything to you
+
+https://www.digitalocean.com/community/tutorials?q=node
+
+Free hosting
+https://glitch.com/
+https://www.pythonanywhere.com/
+
+Solving custom CSS problems
+https://developer.mozilla.org/en-US/docs/Learn/CSS/Howto
+
+Getting your website ready
+from Express itself
+https://expressjs.com/en/advanced/best-practice-performance.html
+https://expressjs.com/en/advanced/best-practice-security.html
+
+Database configuration
+have the server get the database URL from an environment website
+
+const mongoDB = process.env.MONGODB_URI || dev_db_url;
+
+can also use a a .env file
+$ npm dotenv module
+
+Set NODE_ENV to production
+can be done:
+1.) using export
+2.) an environment file
+3.) the OS initialization system
+
+this is done in the .env
+
+how much you choose to log is also important, less is better both for performance and security
+
+Compress your responses
+$ npm install compression
+
+app.js
+const compression = require('compression');
+const app = express();
+app.use(compression());
+
+but in a high-traffic website it is better to use a reverse proxy like Nginx
+
+Helmet
+protects against well known vulnerabilities
+
+https://www.npmjs.com/package/helmet
+
+$ npm install helmet
+
+app.js
+const helmet = require("helmet");
+const app = express();
+// Add helmet to the middleware chain.
+// Set CSP headers to allow our Bootstrap and Jquery to be served
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      "script-src": ["'self'", "code.jquery.com", "cdn.jsdelivr.net"],
+    },
+  }),
+);
+
+Rate limiting to API routes
+limits repeated requests to APIs and endpoints
+$ npm install express-rate-limit
+
+const app = express();
+
+// Set up rate limiter: maximum of twenty requests per minute
+const RateLimit = require("express-rate-limit");
+const limiter = RateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 20,
+});
+// Apply rate limiter to all requests
+app.use(limiter);
+
+Cloudflare provides additional services as well
+https://www.cloudflare.com/
+
+Set the Node version
+$ node --version
+
+package.json
+{
+    "engines": {
+        "node": ">20.14.00"
+    },
+}
+
+for hosting they use Glitch
+https://glitch.com/pricing
+
+https://github.com/marketplace/actions/glitch-project-sync
+
+Check out Nixpacks
+https://nixpacks.com/docs/providers/node
+
+Digital Ocean
+https://www.digitalocean.com/community/tutorials?q=express
+
+https://www.digitalocean.com/community/tutorials?q=node.js
+
+
+
+
+
+
+
+
+
+
+
+
+
